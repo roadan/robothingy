@@ -1,48 +1,55 @@
 package com.rodenski.robothingy
 
-import com.rodenski.robothingy.dataTypes.{Board, Robot}
+import com.rodenski.robothingy.datatypes.{Table, RobotPosition}
 import com.rodenski.robothingy.enums.Command._
 import com.rodenski.robothingy.enums.{Command, Direction}
-
+import com.rodenski.robothingy.Robot._
+import com.rodenski.robothingy.enums.Direction.Direction
 
 /**
-  * For lack of better name
+  * This object
   */
 object REPL {
 
-  def run(board: Board, robot: Option[Robot]): Unit = {
+  def run(table: Table, robot: Option[RobotPosition]): Unit = {
 
-    val cmd = read(board, robot)
-    val thingy = evaluate(cmd, board, robot)
-    run(board, thingy)
+    prompt(table, robot)
+    val cmd = scala.io.StdIn.readLine().split(' ')
+    val newRobot = evaluate(cmd, table, robot)
+    run(table, newRobot)
 
   }
 
-
-  def read(board: Board, robot: Option[Robot]): Array[String] = {
+  /**
+    * Prompts the user to enter a valid input
+    *
+    * @param table the existing table
+    * @param robot the robot
+    */
+  def prompt(table: Table, robot: Option[RobotPosition]) = {
 
     robot match {
-      case None => println(s"Please place Robothingy on the board, note that the boundaries are x=${board.x}, y=${board.y}")
+      case None => println(s"Please place Robothingy on the table, note that the boundaries are x=${table.x}, y=${table.y}")
       case _ => println("Robothingy awaits your command")
     }
 
-    scala.io.StdIn.readLine().split(' ')
   }
 
-  def evaluate(cmd: Array[String], board: Board, robot: Option[Robot]): Option[Robot] = {
+  def evaluate(cmd: Array[String], table: Table, robot: Option[RobotPosition]): Option[RobotPosition] = {
 
+    // maybe use the either monad
     try {
       val cmdType = Command withName cmd(0).toUpperCase
       cmdType match {
         case PLACE =>
-          val params = cmd(1).split(',')
-          val x = Integer.parseInt(params(0))
-          val y = Integer.parseInt(params(1))
-          val dir = Direction withName params(2).toUpperCase
-          Simulator.place(x, y, dir, board)
-        case MOVE => Simulator.move(robot, board)
-        case RIGHT => Simulator.right(robot)
-        case LEFT => Simulator.left(robot)
+          val params = parsePlace(cmd(1))
+          params match {
+            case Some(p) => place(p._1, p._2, p._3, table)
+            case None => robot
+          }
+        case MOVE => move(robot, table)
+        case RIGHT => right(robot)
+        case LEFT => left(robot)
         case REPORT =>
           report(robot)
           robot
@@ -55,10 +62,35 @@ object REPL {
     }
   }
 
-  def report(robot: Option[Robot]) = {
+  /**
+    * This functions parses the parameters passed to the place command
+    *
+    * @param params a comma delimited string containing the params to the place command
+    * @return
+    */
+  def parsePlace(params: String): Option[(Int, Int, Direction)] = {
+
+    val parsed = params.split(',')
+    try {
+      val x = Integer.parseInt(parsed(0))
+      val y = Integer.parseInt(parsed(1))
+      val dir = Direction withName parsed(2).toUpperCase
+      Some((x, y, dir))
+    } catch {
+      case ne: NoSuchElementException =>
+        println(s"invalid direction ${parsed(2)}")
+        None
+      case nf: NumberFormatException =>
+        println("invalid index entered")
+        None
+    }
+
+  }
+
+  def report(robot: Option[RobotPosition]) = {
     robot match {
       case Some(r) => println(s"${r.x}, ${r.y}, ${r.dir.toString}")
-      case None => println("Robothingy in not placed on board, please place Robothingy")
+      case None => println("Robothingy in not placed on table, please place Robothingy")
     }
 
   }

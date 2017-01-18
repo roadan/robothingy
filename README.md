@@ -3,7 +3,7 @@ Pretty straight forward, it's the robot thingy for you know waht :)
 
 ## Build and run
 ```
-gradle shadowJar test 
+./gradlew shadowJar test 
 java -jar build/libs/robothingy-1.0-SNAPSHOT-all.jar
 ```
 

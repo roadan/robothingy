@@ -1,6 +1,6 @@
 package com.rodenski.robothingy
 
-import com.rodenski.robothingy.dataTypes.Board
+import com.rodenski.robothingy.datatypes.Table
 
 
 /**
@@ -8,25 +8,24 @@ import com.rodenski.robothingy.dataTypes.Board
   */
 object Main extends App {
 
-  case class Config(height: Int = 5, width: Int = 5)
+  case class Config(x: Int = 5, y: Int = 5)
 
   val parser = new scopt.OptionParser[Config]("Robothingy!") {
 
-    head("Robothingy!!", "1.0-SNAPSHOT")
-
-    opt[Int]('x', "x-axis") action { (x, c) =>
-      c.copy(height = x)
+    opt[Int]('x', "x-axis") action { (x, conf) =>
+      conf.copy(x = x)
     } text "The height of the robots tabletop"
-    opt[Int]('y', "y-axis") action { (x, c) =>
-      c.copy(width = x)
+    opt[Int]('y', "y-axis") action { (x, conf) =>
+      conf.copy(y = x)
     } text "The width of the robots tabletop"
 
   }
 
   parser.parse(args, Config()) match {
     case Some(conf) =>
-      val board = Board(conf.height, conf.width)
-      REPL.run(board, None)
+      val table = Table(conf.x, conf.y)
+      val robot = None
+      REPL.run(table, robot)
     case None => println("")
 
   }

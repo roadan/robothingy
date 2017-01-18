@@ -1,4 +1,4 @@
-package com.rodenski.robothingy.dataTypes
+package com.rodenski.robothingy.datatypes
 
 import com.rodenski.robothingy.enums.Direction._
 
@@ -9,4 +9,4 @@ import com.rodenski.robothingy.enums.Direction._
   * @param y the index of the robot on the y axis
   * @param dir the direction the robot is facing
   */
-case class Robot(x: Int, y: Int, dir: Direction)
+case class RobotPosition(x: Int, y: Int, dir: Direction)
