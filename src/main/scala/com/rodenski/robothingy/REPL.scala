@@ -7,10 +7,15 @@ import com.rodenski.robothingy.Robot._
 import com.rodenski.robothingy.enums.Direction.Direction
 
 /**
-  * This object
+  * This object manages the read evaluate print loop for Robothingy
   */
 object REPL {
 
+  /**
+    * This is the REPL's loop, implemented as a tail recursion
+    * @param table the tables dimensions
+    * @param robot the robot's position
+    */
   def run(table: Table, robot: Option[RobotPosition]): Unit = {
 
     prompt(table, robot)
@@ -39,7 +44,7 @@ object REPL {
 
     // maybe use the either monad
     try {
-      val cmdType = Command withName cmd(0).toUpperCase
+      val cmdType = Command withName cmd(0).trim.toUpperCase
       cmdType match {
         case PLACE =>
           val params = parsePlace(cmd(1))
@@ -72,9 +77,9 @@ object REPL {
 
     val parsed = params.split(',')
     try {
-      val x = Integer.parseInt(parsed(0))
-      val y = Integer.parseInt(parsed(1))
-      val dir = Direction withName parsed(2).toUpperCase
+      val x = Integer.parseInt(parsed(0).trim)
+      val y = Integer.parseInt(parsed(1).trim)
+      val dir = Direction withName parsed(2).trim.toUpperCase
       Some((x, y, dir))
     } catch {
       case ne: NoSuchElementException =>
